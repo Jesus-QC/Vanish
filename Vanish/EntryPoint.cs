@@ -13,7 +13,7 @@ namespace Vanish;
 
 public class EntryPoint
 {
-    public const string Version = "1.0.0.0";
+    public const string Version = "1.0.0.1";
 
     public static readonly HashSet<ReferenceHub> VanishedPlayers = [];
     
@@ -75,7 +75,7 @@ public class EntryPoint
         
         player.roleManager.ServerSetRole(RoleTypeId.Overwatch, RoleChangeReason.RemoteAdmin);
         
-        foreach (ReferenceHub hub in ReferenceHub.AllHubs.Where(hub => hub != player && hub != ReferenceHub.HostHub))
+        foreach (ReferenceHub hub in ReferenceHub.AllHubs.Where(hub => hub != player && hub != ReferenceHub.HostHub && hub.authManager.RemoteAdminGlobalAccess))
         {
             hub.connectionToClient.Send(new ObjectDestroyMessage
             {
