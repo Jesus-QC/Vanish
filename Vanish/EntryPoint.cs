@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using MEC;
 using Mirror;
 using PlayerRoles;
 using PluginAPI.Core;
@@ -46,8 +47,17 @@ public class EntryPoint
         
         if (!Config.VanishedPlayers.Contains(ev.Player.UserId))
             return;
-        
-        Vanish(ev.Player.ReferenceHub);
+
+        Timing.CallDelayed(0.1f, () =>
+        {
+            Vanish(ev.Player.ReferenceHub);
+        });
+    }
+
+    [PluginEvent(ServerEventType.PlayerLeft)]
+    private void OnPlayerLeft(PlayerLeftEvent ev)
+    {
+        VanishedPlayers.Remove(ev.Player.ReferenceHub);
     }
     
     [PluginEvent(ServerEventType.RoundRestart)]
@@ -61,6 +71,8 @@ public class EntryPoint
 
     public static void Vanish(ReferenceHub player)
     {
+        VanishedPlayers.Add(player);
+        
         player.roleManager.ServerSetRole(RoleTypeId.Overwatch, RoleChangeReason.RemoteAdmin);
         
         foreach (ReferenceHub hub in ReferenceHub.AllHubs.Where(hub => hub != player && hub != ReferenceHub.HostHub))

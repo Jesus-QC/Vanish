@@ -11,7 +11,7 @@ namespace Vanish.Commands;
 [CommandHandler(typeof(RemoteAdminCommandHandler))]
 public class VanishCommand : ICommand
 {
-    public bool Execute(ArraySegment<string> arguments, ICommandSender sender, [UnscopedRef] out string response)
+    public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
         if (sender is not PlayerCommandSender player)
         {
@@ -19,10 +19,8 @@ public class VanishCommand : ICommand
             return false;
         }
 
-        if (!EntryPoint.VanishedPlayers.Add(player.ReferenceHub))
+        if (EntryPoint.VanishedPlayers.Remove(player.ReferenceHub))
         {
-            EntryPoint.VanishedPlayers.Remove(player.ReferenceHub);
-            
             foreach (ReferenceHub hub in ReferenceHub.AllHubs)
             {
                 if (hub == player.ReferenceHub)
