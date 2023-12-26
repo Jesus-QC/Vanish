@@ -6,5 +6,5 @@ public class PluginConfig
 {
     public bool IsEnabled { get; set; } = true;
 
-    public HashSet<string> VanishedPlayers { get; set; } = [];
+    public HashSet<string> VanishedPlayers { get; set; } = ["someone@northwood"];
 }

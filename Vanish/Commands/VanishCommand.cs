@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using CommandSystem;
 using Mirror;
 using PlayerRoles;
+using PluginAPI.Core;
 using RemoteAdmin;
 
 namespace Vanish.Commands;
@@ -30,23 +31,12 @@ public class VanishCommand : ICommand
                 NetworkServer.SendSpawnMessage(player.ReferenceHub.networkIdentity, hub.connectionToClient);
             }
             
+            Log.Info(player.Nickname + " is now visible.");
             response = "You are visible now";
             return true;
         }
         
-        player.ReferenceHub.roleManager.ServerSetRole(RoleTypeId.Overwatch, RoleChangeReason.RemoteAdmin);
-        
-        foreach (ReferenceHub hub in ReferenceHub.AllHubs)
-        {
-            if (hub == player.ReferenceHub || hub == ReferenceHub.HostHub)
-                continue;
-            
-            hub.connectionToClient.Send(new ObjectDestroyMessage
-            {
-                netId = player.ReferenceHub.netId
-            });
-        }
-
+        EntryPoint.Vanish(player.ReferenceHub);
         response = "You are now vanished";
         return true;
     }

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using Mirror;
+using PlayerRoles;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
@@ -16,7 +18,7 @@ public class EntryPoint
     
     [PluginAPI.Core.Attributes.PluginConfig] public static PluginConfig Config;
     
-    private Harmony _harmony = new Harmony("com.jesusqc.vanish");
+    private readonly Harmony _harmony = new Harmony("com.jesusqc.vanish");
     
     [PluginEntryPoint("Vanish", Version, "Makes mods being able to vanish", "Jesus-QC")]
     private void Init()
@@ -33,6 +35,7 @@ public class EntryPoint
     [PluginEvent(ServerEventType.PlayerJoined)]
     private void OnPlayerJoined(PlayerJoinedEvent ev)
     {
+        // Sync all vanished players
         foreach (ReferenceHub hub in VanishedPlayers)
         {
             ev.Player.Connection.Send(new ObjectDestroyMessage
@@ -40,11 +43,34 @@ public class EntryPoint
                 netId = hub.netId
             });
         }
+        
+        if (!Config.VanishedPlayers.Contains(ev.Player.UserId))
+            return;
+        
+        Vanish(ev.Player.ReferenceHub);
     }
     
     [PluginEvent(ServerEventType.RoundRestart)]
     private void OnRoundRestart(RoundRestartEvent ev)
     {
+        // Clear vanished players collection
         VanishedPlayers.Clear();
+    }
+    
+    public static bool IsVanished(ReferenceHub hub) => VanishedPlayers.Contains(hub);
+
+    public static void Vanish(ReferenceHub player)
+    {
+        player.roleManager.ServerSetRole(RoleTypeId.Overwatch, RoleChangeReason.RemoteAdmin);
+        
+        foreach (ReferenceHub hub in ReferenceHub.AllHubs.Where(hub => hub != player && hub != ReferenceHub.HostHub))
+        {
+            hub.connectionToClient.Send(new ObjectDestroyMessage
+            {
+                netId = player.netId
+            });
+        }
+
+        Log.Info(player.nicknameSync.DisplayName + " is now vanished.");
     }
 }

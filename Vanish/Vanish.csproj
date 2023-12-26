@@ -48,7 +48,7 @@
           <HintPath>$(SL_REFERENCES)\CommandSystem.Core.dll</HintPath>
         </Reference>
         <Reference Include="Mirror">
-          <HintPath>D:\_Coding\SCPSL\Dependencies\Mirror-Publicized.dll</HintPath>
+          <HintPath>$(SL_REFERENCES)\Mirror-Publicized.dll</HintPath>
         </Reference>
         <Reference Include="NorthwoodLib">
           <HintPath>$(SL_REFERENCES)\NorthwoodLib.dll</HintPath>
@@ -68,6 +68,8 @@
         <Compile Include="Commands\VanishCommand.cs" />
         <Compile Include="EntryPoint.cs" />
         <Compile Include="Patches\RaPlayerListPatch.cs" />
+        <Compile Include="Patches\SyncedStatMessagesPatch.cs" />
+        <Compile Include="Patches\SyncedStatCanReceivePatch.cs" />
         <Compile Include="PluginConfig.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
     </ItemGroup>
