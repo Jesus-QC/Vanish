@@ -37,12 +37,15 @@ public class EntryPoint
     private void OnPlayerJoined(PlayerJoinedEvent ev)
     {
         // Sync all vanished players
-        foreach (ReferenceHub hub in VanishedPlayers)
+        if (!ev.Player.IsGlobalModerator)
         {
-            ev.Player.Connection.Send(new ObjectDestroyMessage
+            foreach (ReferenceHub hub in VanishedPlayers)
             {
-                netId = hub.netId
-            });
+                ev.Player.Connection.Send(new ObjectDestroyMessage
+                {
+                    netId = hub.netId
+                });
+            }
         }
         
         if (!Config.VanishedPlayers.Contains(ev.Player.UserId))
