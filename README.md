@@ -12,3 +12,10 @@ It fakes that the player has been disconnected by sending to non whitelisted pla
 | IsOverwatchWhitelisted           | Boolean  | If true, players with overwatch permissions will be able to see other vanished players | `true` |
 | IsEnabledOnlyForGlobalModerators | Boolean  | If true, only global moderators will be able to use the vanish command | `false` |
 | IsEnabledOnlyForOverwatch        | Boolean  | If true, only players with overwatch permissions will be able use the vanish command | `false` |
+
+
+## How to use
+
+Run the `vanish` command in the Remote Admin panel, you will be automatically set as overwatch. Once you finish you can use the `vanish` command again.
+
+Anyone with access to RA can use the command with the default settings.
