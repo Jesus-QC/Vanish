@@ -20,14 +20,14 @@ public class RaPlayerListPatch
         
         newInstructions.InsertRange(index, new CodeInstruction[]
         {
-            // If is global mod we dont hide the vanished player
+            // If is global mod we dont hide the vanished players
             new (OpCodes.Ldarg_1),
-            new (OpCodes.Call, AccessTools.Method(typeof(RaPlayerListPatch), nameof(IsGlobalMod))),
+            new (OpCodes.Call, AccessTools.Method(typeof(RaPlayerListPatch), nameof(IsGlobalModOrWhitelisted))),
             new (OpCodes.Brtrue_S, skip),
             
             // We don't show the player if it isn't vanished
             new (OpCodes.Ldloc_S, 9),
-            new (OpCodes.Call, AccessTools.Method(typeof(EntryPoint), nameof(EntryPoint.IsVanished))),
+            new (OpCodes.Call, AccessTools.Method(typeof(VanishHandler), nameof(VanishHandler.IsVanished))),
             new (OpCodes.Brtrue, newInstructions[index - 1].operand),
         });
         
@@ -37,14 +37,14 @@ public class RaPlayerListPatch
         ListPool<CodeInstruction>.Shared.Return(newInstructions);
     }
 
-    private static bool IsGlobalMod(CommandSender sender)
+    private static bool IsGlobalModOrWhitelisted(CommandSender sender)
     {
         foreach (ReferenceHub player in ReferenceHub.AllHubs)
         {
             if (player.authManager.UserId != sender.SenderId)
                 continue;
-
-            return player.authManager.RemoteAdminGlobalAccess;
+            
+            return VanishHandler.IsWhitelisted(player);
         }
 
         return false;

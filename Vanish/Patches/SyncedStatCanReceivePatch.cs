@@ -20,7 +20,7 @@ public class SyncedStatCanReceivePatch
         {
             new (OpCodes.Ldarg_0),
             new (OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(SyncedStatBase), nameof(SyncedStatBase.Hub))),
-            new (OpCodes.Call, AccessTools.Method(typeof(EntryPoint), nameof(EntryPoint.IsVanished))),
+            new (OpCodes.Call, AccessTools.Method(typeof(VanishHandler), nameof(VanishHandler.IsVanished))),
             new (OpCodes.Brtrue, ret)
         });
         

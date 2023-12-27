@@ -19,7 +19,7 @@ public class SyncedStatMessagesPatch
         newInstructions.InsertRange(0, new CodeInstruction[]
         {
             new (OpCodes.Ldarg_1),
-            new (OpCodes.Call, AccessTools.Method(typeof(EntryPoint), nameof(EntryPoint.IsVanished))),
+            new (OpCodes.Call, AccessTools.Method(typeof(VanishHandler), nameof(VanishHandler.IsVanished))),
             new (OpCodes.Brtrue, ret)
         });
         

@@ -1,9 +1,5 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using CommandSystem;
-using Mirror;
-using PlayerRoles;
-using PluginAPI.Core;
 using RemoteAdmin;
 
 namespace Vanish.Commands;
@@ -18,23 +14,27 @@ public class VanishCommand : ICommand
             response = "You must be a player to use this command";
             return false;
         }
-
-        if (EntryPoint.VanishedPlayers.Remove(player.ReferenceHub))
+        
+        if (EntryPoint.Config.IsEnabledOnlyForGlobalModerators && !player.ReferenceHub.authManager.RemoteAdminGlobalAccess)
         {
-            foreach (ReferenceHub hub in ReferenceHub.AllHubs)
-            {
-                if (hub == player.ReferenceHub)
-                    continue;
-                
-                NetworkServer.SendSpawnMessage(player.ReferenceHub.networkIdentity, hub.connectionToClient);
-            }
-            
-            Log.Info(player.Nickname + " is now visible.");
+            response = "You must be a global moderator to use this command";
+            return false;
+        }
+        
+        if (EntryPoint.Config.IsEnabledOnlyForOverwatch && !player.CheckPermission(PlayerPermissions.Overwatch))
+        {
+            response = "You must have overwatch permissions to use this command";
+            return false;
+        }
+        
+        if (VanishHandler.VanishedPlayers.Contains(player.ReferenceHub))
+        {
+            player.ReferenceHub.UnVanish();
             response = "You are visible now";
             return true;
         }
         
-        EntryPoint.Vanish(player.ReferenceHub);
+        player.ReferenceHub.Vanish();
         response = "You are now vanished";
         return true;
     }

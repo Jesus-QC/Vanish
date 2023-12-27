@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using HarmonyLib;
+﻿using HarmonyLib;
 using MEC;
 using Mirror;
-using PlayerRoles;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
@@ -13,9 +10,7 @@ namespace Vanish;
 
 public class EntryPoint
 {
-    public const string Version = "1.0.0.2";
-
-    public static readonly HashSet<ReferenceHub> VanishedPlayers = [];
+    public const string Version = "1.0.0.3";
     
     [PluginAPI.Core.Attributes.PluginConfig] public static PluginConfig Config;
     
@@ -36,10 +31,10 @@ public class EntryPoint
     [PluginEvent(ServerEventType.PlayerJoined)]
     private void OnPlayerJoined(PlayerJoinedEvent ev)
     {
-        // Sync all vanished players
+        // We sync all vanished players
         if (!ev.Player.IsGlobalModerator)
         {
-            foreach (ReferenceHub hub in VanishedPlayers)
+            foreach (ReferenceHub hub in VanishHandler.VanishedPlayers)
             {
                 ev.Player.Connection.Send(new ObjectDestroyMessage
                 {
@@ -53,39 +48,30 @@ public class EntryPoint
 
         Timing.CallDelayed(0.1f, () =>
         {
-            Vanish(ev.Player.ReferenceHub);
+            ev.Player.ReferenceHub.Vanish();
         });
     }
 
     [PluginEvent(ServerEventType.PlayerLeft)]
     private void OnPlayerLeft(PlayerLeftEvent ev)
     {
-        VanishedPlayers.Remove(ev.Player.ReferenceHub);
+        VanishHandler.VanishedPlayers.Remove(ev.Player.ReferenceHub);
+    }
+
+    [PluginEvent(ServerEventType.PlayerChangeRole)]
+    private void OnPlayerChangingRole(PlayerChangeRoleEvent ev)
+    {
+        // If the player is vanished, we unvanish them
+        if (!VanishHandler.VanishedPlayers.Contains(ev.Player.ReferenceHub))
+            return;
+        
+        ev.Player.ReferenceHub.UnVanish();
     }
     
     [PluginEvent(ServerEventType.RoundRestart)]
     private void OnRoundRestart(RoundRestartEvent ev)
     {
         // Clear vanished players collection
-        VanishedPlayers.Clear();
-    }
-    
-    public static bool IsVanished(ReferenceHub hub) => VanishedPlayers.Contains(hub);
-
-    public static void Vanish(ReferenceHub player)
-    {
-        VanishedPlayers.Add(player);
-        
-        player.roleManager.ServerSetRole(RoleTypeId.Overwatch, RoleChangeReason.RemoteAdmin);
-        
-        foreach (ReferenceHub hub in ReferenceHub.AllHubs.Where(hub => hub != player && hub != ReferenceHub.HostHub && hub.authManager.RemoteAdminGlobalAccess))
-        {
-            hub.connectionToClient.Send(new ObjectDestroyMessage
-            {
-                netId = player.netId
-            });
-        }
-
-        Log.Info(player.nicknameSync.DisplayName + " is now vanished.");
+        VanishHandler.VanishedPlayers.Clear();
     }
 }
