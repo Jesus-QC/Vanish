@@ -39,8 +39,8 @@ public static class VanishHandler
             if (hub == ReferenceHub.HostHub) 
                 continue;
             
-            // Do not send it to global moderators
-            if (hub.authManager.RemoteAdminGlobalAccess) 
+            // Do not send it to global moderators and other whitelisted players
+            if (IsWhitelisted(hub))
                 continue;
             
             hub.connectionToClient.Send(new ObjectDestroyMessage { netId = player.netId });

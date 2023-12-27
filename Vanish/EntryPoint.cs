@@ -10,7 +10,7 @@ namespace Vanish;
 
 public class EntryPoint
 {
-    public const string Version = "1.0.0.3";
+    public const string Version = "1.0.0.4";
     
     [PluginAPI.Core.Attributes.PluginConfig] public static PluginConfig Config;
     
