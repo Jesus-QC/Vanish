@@ -46,6 +46,7 @@ public class EntryPoint
         {
             ev.Player.ReceiveHint($"\n\n\n\nThis server is running the Vanish plugin.\nVersion:{Version}", 10f);
         }
+        
         if (!Config.VanishedPlayers.Contains(ev.Player.UserId))
             return;
 
