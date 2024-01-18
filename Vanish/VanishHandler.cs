@@ -17,26 +17,25 @@ public static class VanishHandler
         // Has overwatch permissions and overwatch is whitelisted
         if (EntryPoint.Config.IsOverwatchWhitelisted && hub.queryProcessor._sender.CheckPermission(PlayerPermissions.Overwatch))
             return true;
-        
+
         // Is global moderator
-        return hub.authManager.RemoteAdminGlobalAccess;
+        if (hub.authManager.RemoteAdminGlobalAccess)
+            return true;
+        
+        return ReferenceHub.HostHub == hub;
     }
     
     public static void Vanish(this ReferenceHub player)
     {
-        VanishedPlayers.Add(player);
-        
         // We set the player role to overwatch so it prevents crashes and bugs
         player.roleManager.ServerSetRole(RoleTypeId.Overwatch, RoleChangeReason.RemoteAdmin);
 
+        VanishedPlayers.Add(player);
+     
         foreach (ReferenceHub hub in ReferenceHub.AllHubs)
         {
             // Do not destroy the own player, will cause a crash on its end!
             if (hub == player) 
-                continue;
-            
-            // Do not send it to the host!
-            if (hub == ReferenceHub.HostHub) 
                 continue;
             
             // Do not send it to global moderators and other whitelisted players
@@ -55,7 +54,7 @@ public static class VanishHandler
         
         foreach (ReferenceHub hub in ReferenceHub.AllHubs)
         {
-            if (hub == player)
+            if (hub == player || hub == ReferenceHub.HostHub)
                 continue;
                 
             NetworkServer.SendSpawnMessage(player.networkIdentity, hub.connectionToClient);

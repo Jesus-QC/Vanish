@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using MEC;
 using Mirror;
+using PlayerRoles;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
