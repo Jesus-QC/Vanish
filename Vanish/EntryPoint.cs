@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using MEC;
 using Mirror;
-using PlayerRoles;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
@@ -11,7 +10,7 @@ namespace Vanish;
 
 public class EntryPoint
 {
-    public const string Version = "1.0.0.5";
+    public const string Version = "1.0.0.6";
     
     [PluginAPI.Core.Attributes.PluginConfig] public static PluginConfig Config;
     
