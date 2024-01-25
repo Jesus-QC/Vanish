@@ -7,6 +7,7 @@ namespace Vanish;
 
 public static class VanishHandler
 {
+    private static readonly HashSet<string> VanishedIds = [];
     public static readonly HashSet<ReferenceHub> VanishedPlayers = [];
     
     public static bool IsVanished(ReferenceHub hub) => VanishedPlayers.Contains(hub);
@@ -31,6 +32,7 @@ public static class VanishHandler
         player.roleManager.ServerSetRole(RoleTypeId.Overwatch, RoleChangeReason.RemoteAdmin);
 
         VanishedPlayers.Add(player);
+        VanishedIds.Add(player.authManager.UserId);
      
         foreach (ReferenceHub hub in ReferenceHub.AllHubs)
         {
@@ -51,6 +53,7 @@ public static class VanishHandler
     public static void UnVanish(this ReferenceHub player)
     {
         VanishedPlayers.Remove(player);
+        VanishedIds.Remove(player.authManager.UserId);
         
         foreach (ReferenceHub hub in ReferenceHub.AllHubs)
         {
@@ -62,4 +65,6 @@ public static class VanishHandler
 
         Log.Info(player.nicknameSync.DisplayName + " is now visible.");
     }
+    
+    public static bool IsVanishSaved(string userId) => VanishedIds.Contains(userId) || EntryPoint.Config.VanishedPlayers.Contains(userId);
 }

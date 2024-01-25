@@ -47,7 +47,8 @@ public class EntryPoint
             ev.Player.ReceiveHint($"\n\n\n\nThis server is running the Vanish plugin.\nVersion:{Version}", 10f);
         }
         
-        if (!Config.VanishedPlayers.Contains(ev.Player.UserId))
+        // We vanish the player if they are in the config or if they have disconnected while being vanished
+        if (!VanishHandler.IsVanishSaved(ev.Player.UserId))
             return;
 
         Timing.CallDelayed(0.1f, () =>
