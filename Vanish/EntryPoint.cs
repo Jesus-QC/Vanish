@@ -36,7 +36,7 @@ public class EntryPoint
             return;
 
         // We wait one frame
-        Timing.CallDelayed(Timing.WaitForOneFrame, () =>
+        Timing.CallDelayed(0.1f, () =>
         {
             ev.Player.ReferenceHub.Vanish();
         });
