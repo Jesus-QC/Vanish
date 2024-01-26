@@ -27,34 +27,39 @@ public class EntryPoint
         
         _harmony.PatchAll();
     }
-	
-    [PluginEvent(ServerEventType.PlayerJoined)]
-    private void OnPlayerJoined(PlayerJoinedEvent ev)
+
+    [PluginEvent(ServerEventType.PlayerSpawn)]
+    private void OnPlayerSpawn(PlayerSpawnEvent ev)
     {
-        // We sync all vanished players
-        if (!ev.Player.IsGlobalModerator)
-        {
-            foreach (ReferenceHub hub in VanishHandler.VanishedPlayers)
-            {
-                ev.Player.Connection.Send(new ObjectDestroyMessage
-                {
-                    netId = hub.netId
-                });
-            }
-        }               
-        else 
-        {
-            ev.Player.ReceiveHint($"\n\n\n\nThis server is running the Vanish plugin.\nVersion:{Version}", 10f);
-        }
-        
         // We vanish the player if they are in the config or if they have disconnected while being vanished
         if (!VanishHandler.IsVanishSaved(ev.Player.UserId))
             return;
 
-        Timing.CallDelayed(0.1f, () =>
+        // We wait one frame
+        Timing.CallDelayed(Timing.WaitForOneFrame, () =>
         {
             ev.Player.ReferenceHub.Vanish();
         });
+    }
+    
+    [PluginEvent(ServerEventType.PlayerJoined)]
+    private void OnPlayerJoined(PlayerJoinedEvent ev)
+    {
+        // If the player is global moderator, we send them a hint telling them about the plugin
+        if (ev.Player.IsGlobalModerator)
+        {
+            ev.Player.ReceiveHint($"\n\n\n\nThis server is running the Vanish plugin.\nVersion:{Version}", 10f);
+            return;
+        }          
+        
+        // We sync all vanished players to the new player
+        foreach (ReferenceHub hub in VanishHandler.VanishedPlayers)
+        {
+            ev.Player.Connection.Send(new ObjectDestroyMessage
+            {
+                netId = hub.netId
+            });
+        }
     }
 
     [PluginEvent(ServerEventType.PlayerLeft)]
